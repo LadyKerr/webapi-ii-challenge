@@ -89,31 +89,25 @@ router.post("/", (req, res) => {
 });
 
 //add new comment to specified post ID
-// router.post("/:id/comments", (req, res) => {
-//   const { text } = req.body;
-//   const { id } = req.params.id;
+router.post("/:id/comments", (req, res) => {
+  let postComment = req.body;
+  const { id } = req.params;
+  postComment.post_id = id;
 
-//   if (!id) {
-//     res
-//       .status(404)
-//       .json({ message: "The post with the specified ID does not exist." });
-//   } else if (!text) {
-//     res
-//       .status(400)
-//       .json({ errorMessage: "Please provide text for the comment." });
-//   } else {
-//     DB.insertComment(req.body)
-//       .then(comment => {
-//         res.status(201).json(comment);
-//       })
-//       .catch(err => {
-//         res.status(500).json({
-//           message:
-//             "There was an error while saving the comment to the database."
-//         });
-//       });
-//   }
-// });
+  if (!postComment.text) {
+    res.status(404).json({ message: "Please provide text in the comment." });
+  }
+
+  DB.insertComment(postComment)
+    .then(comment => {
+      res.status(201).json(comment);
+    })
+    .catch(err => {
+      res.status(500).json({
+        error: "There was an error while saving the comment to the database."
+      });
+    });
+});
 
 //delete post by ID
 router.delete("/:id", (req, res) => {

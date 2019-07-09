@@ -67,4 +67,71 @@ router.get("/:id/comments", (req, res) => {
     });
 });
 
+//add new blog post
+router.post("/", (req, res) => {
+  const { title, contents } = req.body;
+
+  if (!title || !contents) {
+    res.status(400).json({
+      errorMessage: "Please provide title and contents for the post."
+    });
+  } else {
+    DB.insert(req.body)
+      .then(newPost => {
+        res.status(201).json(newPost);
+      })
+      .catch(err => {
+        res.status(500).json({
+          eror: "There was an error while saving the post to the database."
+        });
+      });
+  }
+});
+
+//add new comment to specified post ID
+// router.post("/:id/comments", (req, res) => {
+//   const { text } = req.body;
+//   const { id } = req.params.id;
+
+//   if (!id) {
+//     res
+//       .status(404)
+//       .json({ message: "The post with the specified ID does not exist." });
+//   } else if (!text) {
+//     res
+//       .status(400)
+//       .json({ errorMessage: "Please provide text for the comment." });
+//   } else {
+//     DB.insertComment(req.body)
+//       .then(comment => {
+//         res.status(201).json(comment);
+//       })
+//       .catch(err => {
+//         res.status(500).json({
+//           message:
+//             "There was an error while saving the comment to the database."
+//         });
+//       });
+//   }
+// });
+
+//delete post by ID
+router.delete("/:id", (req, res) => {
+  const { id } = req.params;
+
+  DB.remove(id)
+    .then(deleted => {
+      if (deleted) {
+        res.status(200).json(deleted);
+      } else {
+        res
+          .status(404)
+          .json({ message: "The post with the specified ID does not exist." });
+      }
+    })
+    .catch(err => {
+      res.status(500).json({ error: "The post could not be removed." });
+    });
+});
+
 module.exports = router;
